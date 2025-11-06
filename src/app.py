@@ -10,11 +10,12 @@ from datetime import datetime
 # ----------------------------
 # Flask App Configuration
 # ----------------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-INSTANCE_DIR = os.path.join(BASE_DIR, "../instance")
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
 os.makedirs(INSTANCE_DIR, exist_ok=True)  # ✅ Ensure instance folder exists
 
-app = Flask(__name__, static_folder="../static", template_folder="../templates")
+app = Flask(__name__, static_folder=os.path.join(BASE_DIR, "static"),
+            template_folder=os.path.join(BASE_DIR, "templates"))
 
 # ----------------------------
 # Database Setup
@@ -38,9 +39,14 @@ with app.app_context():
     db.create_all()
 
 # ----------------------------
-# Load Model
+# Load Model (Fixed Path)
 # ----------------------------
-model = load_model("../models/emotion_cnn.h5")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "emotion_cnn.h5")
+
+if not os.path.exists(MODEL_PATH):
+    raise FileNotFoundError(f"❌ Model not found at {MODEL_PATH}")
+
+model = load_model(MODEL_PATH)
 EMOTIONS = ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Sad', 'Surprise']
 
 # ----------------------------
