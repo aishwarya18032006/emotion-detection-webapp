@@ -1,0 +1,8 @@
+numpy
+pandas
+opencv-python
+matplotlib
+tensorflow>=2.11
+scikit-learn
+scipy
+imutils

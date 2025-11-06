@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Emotion Detection</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 30px;
+            font-size: 2.2em;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 30px auto;
+            padding: 25px;
+            border-radius: 20px;
+            width: 80%;
+            max-width: 900px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        input[type="file"] {
+            display: block;
+            margin: 15px auto;
+            background: #fff;
+            color: #333;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        button {
+            background: #00c6ff;
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #0072ff, #00c6ff);
+            transform: scale(1.05);
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 1.5em;
+            font-weight: 500;
+        }
+
+        img {
+            border-radius: 12px;
+            margin-top: 10px;
+            max-width: 300px;
+        }
+
+        .history {
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+
+        th {
+            background: rgba(255,255,255,0.2);
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .message {
+            color: #aef6a2;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>😊 Emotion Detection System</h1>
+    <div class="container">
+        <form action="/predict" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*" required>
+            <button type="submit">Predict from Image</button>
+        </form>
+
+        <form action="/webcam">
+            <button type="submit">Open Webcam</button>
+        </form>
+
+        <form action="/delete_history" method="POST" onsubmit="return confirm('Are you sure you want to delete all history?');">
+            <button style="background: linear-gradient(45deg, #ff4b2b, #ff416c);">Delete History</button>
+        </form>
+
+        {% if prediction %}
+            <div class="result">
+                <p>Predicted Emotion: <strong>{{ prediction }}</strong></p>
+                <img src="{{ url_for('static', filename=image_path) }}" alt="Predicted Image">
+            </div>
+        {% endif %}
+
+        {% if message %}
+            <p class="message">{{ message }}</p>
+        {% endif %}
+
+        <div class="history">
+            <h2>📜 Prediction History</h2>
+            {% if records %}
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Emotion</th>
+                        <th>Image</th>
+                        <th>Timestamp</th>
+                    </tr>
+                    {% for r in records %}
+                    <tr>
+                        <td>{{ r.id }}</td>
+                        <td>{{ r.emotion }}</td>
+                        <td>
+                            {% if r.image_path %}
+                                <img src="{{ url_for('static', filename=r.image_path) }}" width="60">
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ r.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>No records found yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>
